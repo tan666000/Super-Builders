@@ -233,7 +233,7 @@ index e5a56fcfc..d0fca7da3 100644
 +	}
 +#endif
 +
- #ifdef CONFIG_KSU_SUSFS_HIDDEN_NAME
+ #ifdef CONFIG_KSU_SUSFS_SUS_PATH
  	buf.sb = f.file->f_inode->i_sb;
  #endif
  	error = iterate_dir(f.file, &buf.ctx);
@@ -281,7 +281,7 @@ index e5a56fcfc..d0fca7da3 100644
 +	}
 +#endif
 +
- #ifdef CONFIG_KSU_SUSFS_HIDDEN_NAME
+ #ifdef CONFIG_KSU_SUSFS_SUS_PATH
  	buf.sb = f.file->f_inode->i_sb;
  #endif
  	error = iterate_dir(f.file, &buf.ctx);
@@ -329,7 +329,7 @@ index e5a56fcfc..d0fca7da3 100644
 +	}
 +#endif
 +
- #ifdef CONFIG_KSU_SUSFS_HIDDEN_NAME
+ #ifdef CONFIG_KSU_SUSFS_SUS_PATH
  	buf.sb = f.file->f_inode->i_sb;
  #endif
  	error = iterate_dir(f.file, &buf.ctx);
