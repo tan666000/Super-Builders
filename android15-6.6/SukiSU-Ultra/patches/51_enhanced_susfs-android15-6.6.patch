@@ -284,7 +284,7 @@ diff -ruN a/fs/stat.c b/fs/stat.c
  
 diff -ruN a/fs/susfs.c b/fs/susfs.c
 --- a/fs/susfs.c	2026-03-31 05:54:06.061906852 +0100
-+++ b/fs/susfs.c	2026-03-31 06:01:47.123031020 +0100
++++ b/fs/susfs.c	2026-03-31 06:57:18.997601215 +0100
 @@ -8,6 +8,7 @@
  #include <linux/list.h>
  #include <linux/init_task.h>
@@ -406,7 +406,11 @@ diff -ruN a/fs/susfs.c b/fs/susfs.c
  #endif
  
  bool susfs_starts_with(const char *str, const char *prefix) {
-@@ -52,6 +148,147 @@
+@@ -48,10 +144,150 @@
+ 
+ /* sus_path */
+ #ifdef CONFIG_KSU_SUSFS_SUS_PATH
+-DEFINE_STATIC_SRCU(susfs_srcu_sus_path_loop);
  static DEFINE_SPINLOCK(susfs_spin_lock_sus_path);
  static LIST_HEAD(LH_SUS_PATH_LOOP);
  
@@ -554,7 +558,7 @@ diff -ruN a/fs/susfs.c b/fs/susfs.c
  const struct qstr susfs_fake_qstr_name = QSTR_INIT("..5.u.S", 7); // used to re-test the dcache lookup, make sure you don't have file named like this!!
  
  void susfs_add_sus_path(void __user **user_info) {
-@@ -86,13 +323,69 @@
+@@ -86,13 +322,69 @@
  			goto out_path_put_path;
  		}
  		set_bit(AS_FLAGS_SUS_PATH, &fi->inode.i_mapping->flags);
@@ -625,7 +629,7 @@ diff -ruN a/fs/susfs.c b/fs/susfs.c
  	SUSFS_LOGI("flagged AS_FLAGS_SUS_PATH on pathname: '%s', ino: '%lu', inode->i_mapping->flags: 0x%lx\n",
  				info.target_pathname, inode->i_ino, inode->i_mapping->flags);
  	info.err = 0;
-@@ -102,6 +395,10 @@
+@@ -102,6 +394,10 @@
  	if (copy_to_user(&((struct st_susfs_sus_path __user*)*user_info)->err, &info.err, sizeof(info.err))) {
  		info.err = -EFAULT;
  	}
@@ -636,7 +640,7 @@ diff -ruN a/fs/susfs.c b/fs/susfs.c
  	SUSFS_LOGI("CMD_SUSFS_ADD_SUS_PATH -> ret: %d\n", info.err);
  }
  
-@@ -142,39 +439,118 @@
+@@ -142,39 +438,118 @@
  
  void susfs_run_sus_path_loop(void) {
  	struct st_susfs_sus_path_list *cursor = NULL;
@@ -765,7 +769,7 @@ diff -ruN a/fs/susfs.c b/fs/susfs.c
  }
  
  static inline bool is_i_uid_not_allowed(uid_t i_uid) {
-@@ -195,6 +571,8 @@
+@@ -195,6 +570,8 @@
  		SUSFS_LOGE("inode->i_mapping is NULL\n");
  		return false;
  	}
@@ -774,7 +778,7 @@ diff -ruN a/fs/susfs.c b/fs/susfs.c
  	if (inode->i_sb->s_magic == FUSE_SUPER_MAGIC) {
  		fi = get_fuse_inode(inode);
  		if (!fi || !fi->inode.i_mapping) {
-@@ -308,7 +686,11 @@
+@@ -308,7 +685,11 @@
  		
  out_path_put_path:
  	path_put(&path);
@@ -786,7 +790,7 @@ diff -ruN a/fs/susfs.c b/fs/susfs.c
  }
  
  void susfs_add_sus_kstat(void __user **user_info) {
-@@ -581,6 +963,164 @@
+@@ -581,6 +962,164 @@
  	}
  	rcu_read_unlock();
  }
@@ -951,7 +955,7 @@ diff -ruN a/fs/susfs.c b/fs/susfs.c
  #endif // #ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
  
  /* spoof_uname */
-@@ -673,10 +1213,10 @@
+@@ -673,10 +1212,10 @@
  
  void susfs_set_cmdline_or_bootconfig(void __user **user_info) {
  	struct st_susfs_spoof_cmdline_or_bootconfig *info = (struct st_susfs_spoof_cmdline_or_bootconfig *)kzalloc(sizeof(struct st_susfs_spoof_cmdline_or_bootconfig), GFP_KERNEL);
@@ -965,7 +969,7 @@ diff -ruN a/fs/susfs.c b/fs/susfs.c
  	}
  
  	if (copy_from_user(info, (struct st_susfs_spoof_cmdline_or_bootconfig __user*)*user_info, sizeof(struct st_susfs_spoof_cmdline_or_bootconfig))) {
-@@ -1141,8 +1681,8 @@
+@@ -1141,8 +1680,8 @@
  	size_t copied_size = 0;
  
  	if (!info) {
@@ -976,7 +980,7 @@ diff -ruN a/fs/susfs.c b/fs/susfs.c
  	}
  
  	if (copy_from_user(info, (struct st_susfs_enabled_features __user*)*user_info, sizeof(struct st_susfs_enabled_features))) {
-@@ -1197,6 +1737,16 @@
+@@ -1197,6 +1736,16 @@
  	if (info->err) goto out_copy_to_user;
  	buf_ptr = info->enabled_features + copied_size;
  #endif
