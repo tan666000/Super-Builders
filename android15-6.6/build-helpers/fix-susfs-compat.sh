@@ -162,5 +162,36 @@ else
     echo "fix-susfs-compat: setuid_hook.c not found — skipping"
 fi
 
+# ---------------------------------------------------------------------------
+# Fix 7: task_mmu.c — pagemap_read vma scoping on older sublevels
+# The 50_ patch wraps 'struct vm_area_struct *vma;' in #ifdef SUS_MAP
+# inside pagemap_read(). On older sublevels the declaration and usage
+# land in different block scopes due to fuzz, causing undeclared/unused
+# errors. Fix: make the declaration unconditional.
+# ---------------------------------------------------------------------------
+if [ -f "$TMU" ]; then
+    if grep -B1 'struct vm_area_struct \*vma;' "$TMU" | grep -q 'CONFIG_KSU_SUSFS_SUS_MAP'; then
+        echo "fix-susfs-compat: fixing pagemap_read vma scoping in task_mmu.c"
+        python3 - "$TMU" << 'PYEOF'
+import sys
+path = sys.argv[1]
+with open(path) as f:
+    lines = f.readlines()
+i = 0
+while i < len(lines):
+    if 'CONFIG_KSU_SUSFS_SUS_MAP' in lines[i] and i+2 < len(lines) \
+       and 'struct vm_area_struct *vma;' in lines[i+1] \
+       and '#endif' in lines[i+2]:
+        vma_line = lines[i+1]
+        lines[i:i+3] = [vma_line]
+        print(f"  removed #ifdef/#endif around vma decl at line {i+1}")
+        break
+    i += 1
+with open(path, 'w') as f:
+    f.writelines(lines)
+PYEOF
+    fi
+fi
+
 echo "fix-susfs-compat: done"
 exit 0
